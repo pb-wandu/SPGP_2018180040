@@ -2,10 +2,11 @@ package Seungwan.HeosilStory;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.graphics.Color;
+import android.content.Intent;
 import android.view.View;
 import android.os.Bundle;
 
+// import android.graphics.Color;
 // import android.content.Intent;
 // import android.net.Uri;
 // import android.text.Editable;
@@ -163,5 +164,11 @@ public class MainActivity extends AppCompatActivity {
 
                 break;
         }
+    }
+
+    // 게임 시작
+    public void StartGame(View view) {
+        Intent intent = new Intent(this, GameActivity.class);
+        startActivity(intent);
     }
 }
