@@ -35,11 +35,6 @@ public class GameView extends View implements Choreographer.FrameCallback {
         super(context);
         this.activity = (Activity)context;
 
-        // 경계선 그리기
-        borderPaint.setStyle(Paint.Style.STROKE);
-        borderPaint.setStrokeWidth(0.1f);
-        borderPaint.setColor(Color.BLACK);
-
         // 전체화면 설정
         setFullScreen();
         
@@ -90,7 +85,8 @@ public class GameView extends View implements Choreographer.FrameCallback {
     public static final float SCREEN_WIDTH = 9.0f;
     public static final float SCREEN_HEIGHT = 16.0f;
     private final Matrix transformMatrix = new Matrix();
-    private final RectF borderRect = new RectF(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    private final RectF borderRect = new RectF
+            (0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     private final Paint borderPaint = new Paint();
     private final Paint stageinfoPaint = new Paint();
 
@@ -116,16 +112,37 @@ public class GameView extends View implements Choreographer.FrameCallback {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         canvas.save();
+
         canvas.concat(transformMatrix);
+
+        // 게임 화면 그리기
+        borderPaint.setStyle(Paint.Style.FILL);
+        borderPaint.setColor(Color.rgb(200, 255, 200));
         canvas.drawRect(borderRect, borderPaint);
 
         canvas.restore();
+
+        // 게임 화면의 시작 x, y 및 끝 x, y를 저장한다.
+        float[] startPoint = { borderRect.left, borderRect.top };
+        float[] endPoint = { borderRect.right, borderRect.bottom };
+        transformMatrix.mapPoints(startPoint);
+        transformMatrix.mapPoints(endPoint);
+        float marginSize = 20;
+        float gameStartX = startPoint[0] + marginSize;
+        float gameStartY = startPoint[1] + marginSize;
+        float gameEndX = endPoint[0] - marginSize;
+        float gameEndY = endPoint[1] - marginSize;
+
+        // 게임 화면 내부 그리기 (실제 게임 범위)
+        borderPaint.setStyle(Paint.Style.FILL);
+        borderPaint.setColor(Color.rgb(255, 255, 255));
+        canvas.drawRect(gameStartX, gameStartY, gameEndX, gameEndY, borderPaint);
 
         // 스테이지 정보 텍스트 표시
         stageinfoPaint.setColor(Color.BLACK);
         stageinfoPaint.setTextSize(40f);
         canvas.drawText("현재 스테이지 : [" + nowWorld + " - " + nowStage + "]",
-                borderRect.left + 20f, borderRect.top + 50f,
+                gameStartX + 20f, gameStartY + 50f,
                 stageinfoPaint);
         
         // ### 테스트용 - 클릭시 해당 위치에 사각형 표시
