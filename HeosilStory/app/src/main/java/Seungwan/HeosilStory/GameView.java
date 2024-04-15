@@ -122,7 +122,7 @@ public class GameView extends View implements Choreographer.FrameCallback {
 
         canvas.restore();
 
-        // 게임 화면의 시작 x, y 및 끝 x, y를 저장한다.
+        // 게임 화면의 시작 x, y 및 끝 x, y
         float[] startPoint = { borderRect.left, borderRect.top };
         float[] endPoint = { borderRect.right, borderRect.bottom };
         transformMatrix.mapPoints(startPoint);
@@ -144,6 +144,23 @@ public class GameView extends View implements Choreographer.FrameCallback {
         canvas.drawText("현재 스테이지 : [" + nowWorld + " - " + nowStage + "]",
                 gameStartX + 20f, gameStartY + 50f,
                 stageinfoPaint);
+
+        // 상 / 하단 레이아웃 구분 기준 Y
+        float dividingY = (gameStartY + gameEndY) * (3.0f / 5.0f);
+
+        // 하단 레이아웃 영역 그리기
+        borderPaint.setStyle(Paint.Style.FILL);
+        borderPaint.setColor(Color.rgb(180, 180, 180));
+        canvas.drawRect(gameStartX, dividingY, gameEndX, gameEndY, borderPaint);
+
+        // ### 할 것들
+        // (비율은 임시)
+        // - 세로로 3 : 2 분할한 다음
+        // - 가로 레이아웃 1 : 2 : 1
+        // - 1에 해당하는 내부에 버튼 1 : 1
+
+
+
         
         // ### 테스트용 - 클릭시 해당 위치에 사각형 표시
         if (touchX != -1 && touchY != -1) {
