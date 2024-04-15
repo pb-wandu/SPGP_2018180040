@@ -23,20 +23,32 @@ public class GameView extends View implements Choreographer.FrameCallback {
     private static final String TAG = GameView.class.getSimpleName();
     private final Activity activity;
 
+    // ### (임시) 현재 스테이지를 1-1로 지정함
+    private int nowWorld = MainActivity.nowWorld = 1;
+    private int nowStage = MainActivity.nowStage = 1;
+
+    // 현재 터치한 좌표
+    private float touchX = -1;
+    private float touchY = -1;
+
     public GameView(Context context) {
         super(context);
         this.activity = (Activity)context;
 
         // 경계선 그리기
-        borderPaint = new Paint();
         borderPaint.setStyle(Paint.Style.STROKE);
         borderPaint.setStrokeWidth(0.1f);
         borderPaint.setColor(Color.BLACK);
 
         // 전체화면 설정
         setFullScreen();
+        
+        // 현재 표시중인 메뉴
+        MainActivity.nowShowingMenu = "GameMenu";
 
-        Resources res = getResources();
+
+
+        // Resources res = getResources();
         // Bitmap ballBitmap = BitmapFactory.decodeResource(res, R.mipmap.soccer_ball_240);
         // Ball.setBitmap(ballBitmap);
 
@@ -79,7 +91,8 @@ public class GameView extends View implements Choreographer.FrameCallback {
     public static final float SCREEN_HEIGHT = 16.0f;
     private final Matrix transformMatrix = new Matrix();
     private final RectF borderRect = new RectF(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    private final Paint borderPaint;
+    private final Paint borderPaint = new Paint();
+    private final Paint stageinfoPaint = new Paint();
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -107,11 +120,37 @@ public class GameView extends View implements Choreographer.FrameCallback {
         canvas.drawRect(borderRect, borderPaint);
 
         canvas.restore();
+
+        // 스테이지 정보 텍스트 표시
+        stageinfoPaint.setColor(Color.BLACK);
+        stageinfoPaint.setTextSize(40f);
+        canvas.drawText("현재 스테이지 : [" + nowWorld + " - " + nowStage + "]",
+                borderRect.left + 20f, borderRect.top + 50f,
+                stageinfoPaint);
+        
+        // ### 테스트용 - 클릭시 해당 위치에 사각형 표시
+        if (touchX != -1 && touchY != -1) {
+            float rectSize = 25f; // Size of the rectangle
+            float rectLeft = touchX - rectSize / 2;
+            float rectTop = touchY - rectSize / 2;
+            float rectRight = touchX + rectSize / 2;
+            float rectBottom = touchY + rectSize / 2;
+
+            Paint rectPaint = new Paint();
+            rectPaint.setColor(Color.RED);
+            rectPaint.setStyle(Paint.Style.FILL);
+            canvas.drawRect(rectLeft, rectTop, rectRight, rectBottom, rectPaint);
+        }
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
+
+            // 입력받은 좌표를 저장한다.
+            touchX = event.getX();
+            touchY = event.getY();
+
             update();
             invalidate();
         }

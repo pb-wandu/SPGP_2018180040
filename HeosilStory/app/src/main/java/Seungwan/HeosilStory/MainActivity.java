@@ -17,6 +17,7 @@ import android.os.Bundle;
 import Seungwan.HeosilStory.R;
 import Seungwan.HeosilStory.databinding.ActivityMainBinding;
 
+
 /* -----[메인 액티비티]----- */
 public class MainActivity extends AppCompatActivity {
 
@@ -36,12 +37,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // 현재 메뉴, 현재 모드
-    private String nowShowingMenu = "MainMenu";
-    private String nowMode = "StoryMode";
+    public static String nowShowingMenu = "MainMenu";
+    public static String nowMode = "StoryMode";
 
     // 클리어한 스테이지 정보 표시
-    private int clearedWorld = 0;
-    private int clearedStage = 0;
+    public static int clearedWorld = 0;
+    public static int clearedStage = 0;
+
+    // 현재 스테이지 정보 표시
+    public static int nowWorld = 0;
+    public static int nowStage = 0;
 
     // 메인 화면 메뉴로 이동
     public void moveToMainMenu(View view) {
@@ -171,4 +176,5 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, GameActivity.class);
         startActivity(intent);
     }
+
 }
