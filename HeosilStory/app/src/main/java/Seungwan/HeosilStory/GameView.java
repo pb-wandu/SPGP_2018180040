@@ -31,16 +31,19 @@ public class GameView extends View implements Choreographer.FrameCallback {
     private float touchX = -1;
     private float touchY = -1;
 
+    // 각 버튼별 코드
+    private final int atkBtnCode = 11;
+    private final int defBtnCode = 12;
+
     public GameView(Context context) {
         super(context);
-        this.activity = (Activity)context;
+        this.activity = (Activity) context;
 
         // 전체화면 설정
         setFullScreen();
-        
+
         // 현재 표시중인 메뉴
         MainActivity.nowShowingMenu = "GameMenu";
-
 
 
         // Resources res = getResources();
@@ -61,7 +64,7 @@ public class GameView extends View implements Choreographer.FrameCallback {
         if (isShown()) {
             scheduleUpdate();
         }
-    };
+    }
 
     // 최대 크기로 설정
     public void setFullScreen() {
@@ -75,9 +78,9 @@ public class GameView extends View implements Choreographer.FrameCallback {
         Context context = getContext();
         while (context instanceof ContextWrapper) {
             if (context instanceof Activity) {
-                return (Activity)context;
+                return (Activity) context;
             }
-            context = ((ContextWrapper)context).getBaseContext();
+            context = ((ContextWrapper) context).getBaseContext();
         }
         return null;
     }
@@ -90,11 +93,15 @@ public class GameView extends View implements Choreographer.FrameCallback {
     private final Paint borderPaint = new Paint();
     private final Paint stageinfoPaint = new Paint();
 
+    private final Paint touchPointPaint = new Paint();
+
+    private final Paint btnPaint = new Paint();
+
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
 
-        float view_ratio = (float)w / (float)h;
+        float view_ratio = (float) w / (float) h;
         float game_ratio = SCREEN_WIDTH / SCREEN_HEIGHT;
 
         if (view_ratio > game_ratio) {
@@ -106,6 +113,23 @@ public class GameView extends View implements Choreographer.FrameCallback {
             transformMatrix.setTranslate(0, (h - w / game_ratio) / 2);
             transformMatrix.preScale(scale, scale);
         }
+    }
+
+    // 입력받은 네 좌표를 가지고 버튼을 그린다.
+    void drawBtn(Canvas c, int code, float l, float t, float r, float b) {
+
+        // 코드에 따라 이미지 다르게 표시할 예정
+        switch(code){
+            case atkBtnCode:
+                btnPaint.setColor(Color.rgb(200, 120, 120));
+                break;
+            case defBtnCode:
+                btnPaint.setColor(Color.rgb(120, 200, 120));
+                break;
+        }
+
+        btnPaint.setStyle(Paint.Style.FILL);
+        c.drawRect(l, t, r, b, btnPaint);
     }
 
     @Override
@@ -123,8 +147,8 @@ public class GameView extends View implements Choreographer.FrameCallback {
         canvas.restore();
 
         // 게임 화면의 시작 x, y 및 끝 x, y
-        float[] startPoint = { borderRect.left, borderRect.top };
-        float[] endPoint = { borderRect.right, borderRect.bottom };
+        float[] startPoint = {borderRect.left, borderRect.top};
+        float[] endPoint = {borderRect.right, borderRect.bottom};
         transformMatrix.mapPoints(startPoint);
         transformMatrix.mapPoints(endPoint);
         float marginSize = 20;
@@ -132,6 +156,9 @@ public class GameView extends View implements Choreographer.FrameCallback {
         float gameStartY = startPoint[1] + marginSize;
         float gameEndX = endPoint[0] - marginSize;
         float gameEndY = endPoint[1] - marginSize;
+
+        float gameScreenSizeX = gameEndX - gameStartX;
+        float gameScreenSizeY = gameEndY - gameStartY;
 
         // 게임 화면 내부 그리기 (실제 게임 범위)
         borderPaint.setStyle(Paint.Style.FILL);
@@ -145,7 +172,7 @@ public class GameView extends View implements Choreographer.FrameCallback {
                 gameStartX + 20f, gameStartY + 50f,
                 stageinfoPaint);
 
-        // 상 / 하단 레이아웃 구분 기준 Y
+        // 상 / 하단 레이아웃 구분 (3:2) 기준 Y
         float dividingY = (gameStartY + gameEndY) * (3.0f / 5.0f);
 
         // 하단 레이아웃 영역 그리기
@@ -153,27 +180,43 @@ public class GameView extends View implements Choreographer.FrameCallback {
         borderPaint.setColor(Color.rgb(180, 180, 180));
         canvas.drawRect(gameStartX, dividingY, gameEndX, gameEndY, borderPaint);
 
-        // ### 할 것들
-        // (비율은 임시)
-        // - 세로로 3 : 2 분할한 다음
-        // - 가로 레이아웃 1 : 2 : 1
-        // - 1에 해당하는 내부에 버튼 1 : 1
+        // 공격, 방어 버튼 크기
+        float buttonAtkSizeX = gameScreenSizeX * 1 / 5;
+        float buttonDefSizeX = gameScreenSizeX * 1 / 5;
+        float buttonAtkSizeY = gameScreenSizeY * 1 / 5;
+        float buttonDefSizeY = gameScreenSizeY * 1 / 5;
 
+        // 각 버튼의 시작 지점
+        float leftButtonAtkStartX = gameStartX;
+        float leftButtonDefStartX = gameStartX;
+        float leftButtonAtkStartY = dividingY;
+        float rightButtonAtkStartY = dividingY;
+        float rightButtonAtkStartX = gameEndX - buttonAtkSizeX;
+        float rightButtonDefStartX = gameEndX - buttonDefSizeX;
+        float leftButtonDefStartY = dividingY + buttonAtkSizeY;
+        float rightButtonDefStartY = dividingY + buttonDefSizeY;
 
+        // 버튼 그리기
 
-        
+        drawBtn(canvas, atkBtnCode, leftButtonAtkStartX, leftButtonAtkStartY,
+                leftButtonAtkStartX+buttonAtkSizeX, rightButtonDefStartY);
+        drawBtn(canvas, atkBtnCode, rightButtonAtkStartX, rightButtonAtkStartY,
+                gameEndX, rightButtonDefStartY);
+        drawBtn(canvas, defBtnCode, leftButtonDefStartX, leftButtonDefStartY,
+                leftButtonAtkStartX+buttonAtkSizeX, gameEndY);
+        drawBtn(canvas, defBtnCode, rightButtonDefStartX, rightButtonDefStartY,
+                gameEndX, gameEndY);
+
         // ### 테스트용 - 클릭시 해당 위치에 사각형 표시
         if (touchX != -1 && touchY != -1) {
-            float rectSize = 25f; // Size of the rectangle
+            float rectSize = 25f;
             float rectLeft = touchX - rectSize / 2;
             float rectTop = touchY - rectSize / 2;
             float rectRight = touchX + rectSize / 2;
             float rectBottom = touchY + rectSize / 2;
-
-            Paint rectPaint = new Paint();
-            rectPaint.setColor(Color.RED);
-            rectPaint.setStyle(Paint.Style.FILL);
-            canvas.drawRect(rectLeft, rectTop, rectRight, rectBottom, rectPaint);
+            touchPointPaint.setColor(Color.RED);
+            touchPointPaint.setStyle(Paint.Style.FILL);
+            canvas.drawRect(rectLeft, rectTop, rectRight, rectBottom, touchPointPaint);
         }
     }
 
@@ -195,4 +238,3 @@ public class GameView extends View implements Choreographer.FrameCallback {
 
     }
 }
-
