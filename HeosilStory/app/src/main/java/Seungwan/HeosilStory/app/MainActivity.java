@@ -1,4 +1,4 @@
-package Seungwan.HeosilStory;
+package Seungwan.HeosilStory.app;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -16,6 +16,7 @@ import android.os.Bundle;
 
 import Seungwan.HeosilStory.R;
 import Seungwan.HeosilStory.databinding.ActivityMainBinding;
+import Seungwan.HeosilStory.framework.activity.GameActivity;
 
 
 /* -----[메인 액티비티]----- */

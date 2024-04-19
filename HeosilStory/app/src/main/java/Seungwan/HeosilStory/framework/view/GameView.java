@@ -1,9 +1,8 @@
-package Seungwan.HeosilStory;
+package Seungwan.HeosilStory.framework.view;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -13,6 +12,9 @@ import android.graphics.RectF;
 import android.view.Choreographer;
 import android.view.MotionEvent;
 import android.view.View;
+
+import Seungwan.HeosilStory.app.MainActivity;
+import Seungwan.HeosilStory.game.imageBox;
 
 // import android.graphics.Bitmap;
 // import android.graphics.BitmapFactory;
@@ -32,8 +34,8 @@ public class GameView extends View implements Choreographer.FrameCallback {
     private float touchY = -1;
 
     // 각 버튼별 코드
-    private final int atkBtnCode = 11;
-    private final int defBtnCode = 12;
+    public static final int atkBtnCode = 11;
+    public static final int defBtnCode = 12;
 
     public GameView(Context context) {
         super(context);
@@ -95,7 +97,11 @@ public class GameView extends View implements Choreographer.FrameCallback {
 
     private final Paint touchPointPaint = new Paint();
 
-    private final Paint btnPaint = new Paint();
+    // 이미지 박스 오브젝트 (공격, 방어 버튼)
+    imageBox leftAtkBtn = new imageBox();
+    imageBox leftDefBtn = new imageBox();
+    imageBox rightAtkBtn = new imageBox();
+    imageBox rightDefBtn = new imageBox();
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -115,22 +121,7 @@ public class GameView extends View implements Choreographer.FrameCallback {
         }
     }
 
-    // 입력받은 네 좌표를 가지고 버튼을 그린다.
-    void drawBtn(Canvas c, int code, float l, float t, float r, float b) {
 
-        // 코드에 따라 이미지 다르게 표시할 예정
-        switch(code){
-            case atkBtnCode:
-                btnPaint.setColor(Color.rgb(200, 120, 120));
-                break;
-            case defBtnCode:
-                btnPaint.setColor(Color.rgb(120, 200, 120));
-                break;
-        }
-
-        btnPaint.setStyle(Paint.Style.FILL);
-        c.drawRect(l, t, r, b, btnPaint);
-    }
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -196,15 +187,14 @@ public class GameView extends View implements Choreographer.FrameCallback {
         float leftButtonDefStartY = dividingY + buttonAtkSizeY;
         float rightButtonDefStartY = dividingY + buttonDefSizeY;
 
-        // 버튼 그리기
 
-        drawBtn(canvas, atkBtnCode, leftButtonAtkStartX, leftButtonAtkStartY,
+        leftAtkBtn.drawImageBox(canvas, atkBtnCode, leftButtonAtkStartX, leftButtonAtkStartY,
                 leftButtonAtkStartX+buttonAtkSizeX, rightButtonDefStartY);
-        drawBtn(canvas, atkBtnCode, rightButtonAtkStartX, rightButtonAtkStartY,
+        rightAtkBtn.drawImageBox(canvas, atkBtnCode, rightButtonAtkStartX, rightButtonAtkStartY,
                 gameEndX, rightButtonDefStartY);
-        drawBtn(canvas, defBtnCode, leftButtonDefStartX, leftButtonDefStartY,
+        leftDefBtn.drawImageBox(canvas, defBtnCode, leftButtonDefStartX, leftButtonDefStartY,
                 leftButtonAtkStartX+buttonAtkSizeX, gameEndY);
-        drawBtn(canvas, defBtnCode, rightButtonDefStartX, rightButtonDefStartY,
+        rightDefBtn.drawImageBox(canvas, defBtnCode, rightButtonDefStartX, rightButtonDefStartY,
                 gameEndX, gameEndY);
 
         // ### 테스트용 - 클릭시 해당 위치에 사각형 표시
