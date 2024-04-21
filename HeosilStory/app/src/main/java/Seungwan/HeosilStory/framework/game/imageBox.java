@@ -1,4 +1,4 @@
-package Seungwan.HeosilStory.game;
+package Seungwan.HeosilStory.framework.game;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -9,8 +9,15 @@ import Seungwan.HeosilStory.framework.view.GameView;
 // 이미지 박스 오브젝트
 public class imageBox {
 
+    // 좌표들
+    public float sx, sy, ex, ey;
+
+    public void setPosition(float l, float t, float r, float b){
+        sx = l; sy = t; ex = r; ey = b;
+    }
+
     // 입력받은 네 좌표를 가지고 버튼을 그린다.
-    public void drawImageBox(Canvas c, int code, float l, float t, float r, float b) {
+    public void drawImageBox(Canvas c, int code) {
 
         final Paint btnPaint = new Paint();
 
@@ -25,6 +32,6 @@ public class imageBox {
         }
 
         btnPaint.setStyle(Paint.Style.FILL);
-        c.drawRect(l, t, r, b, btnPaint);
+        c.drawRect(sx, sy, ex, ey, btnPaint);
     }
 }

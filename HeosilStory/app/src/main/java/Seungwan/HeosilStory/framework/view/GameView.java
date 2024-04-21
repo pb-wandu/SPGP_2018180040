@@ -14,7 +14,8 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import Seungwan.HeosilStory.app.MainActivity;
-import Seungwan.HeosilStory.game.imageBox;
+import Seungwan.HeosilStory.framework.game.imageBox;
+import Seungwan.HeosilStory.framework.game.Functions;
 
 // import android.graphics.Bitmap;
 // import android.graphics.BitmapFactory;
@@ -28,6 +29,9 @@ public class GameView extends View implements Choreographer.FrameCallback {
     // ### (임시) 현재 스테이지를 1-1로 지정함
     private int nowWorld = MainActivity.nowWorld = 1;
     private int nowStage = MainActivity.nowStage = 1;
+
+    // 임시 정보 표시용 텍스트
+    String textInfoTemp = "";
 
     // 현재 터치한 좌표
     private float touchX = -1;
@@ -121,8 +125,6 @@ public class GameView extends View implements Choreographer.FrameCallback {
         }
     }
 
-
-
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -156,13 +158,6 @@ public class GameView extends View implements Choreographer.FrameCallback {
         borderPaint.setColor(Color.rgb(255, 255, 255));
         canvas.drawRect(gameStartX, gameStartY, gameEndX, gameEndY, borderPaint);
 
-        // 스테이지 정보 텍스트 표시
-        stageinfoPaint.setColor(Color.BLACK);
-        stageinfoPaint.setTextSize(40f);
-        canvas.drawText("현재 스테이지 : [" + nowWorld + " - " + nowStage + "]",
-                gameStartX + 20f, gameStartY + 50f,
-                stageinfoPaint);
-
         // 상 / 하단 레이아웃 구분 (3:2) 기준 Y
         float dividingY = (gameStartY + gameEndY) * (3.0f / 5.0f);
 
@@ -187,17 +182,59 @@ public class GameView extends View implements Choreographer.FrameCallback {
         float leftButtonDefStartY = dividingY + buttonAtkSizeY;
         float rightButtonDefStartY = dividingY + buttonDefSizeY;
 
-
-        leftAtkBtn.drawImageBox(canvas, atkBtnCode, leftButtonAtkStartX, leftButtonAtkStartY,
+        // 위치 지정
+        leftAtkBtn.setPosition(leftButtonAtkStartX, leftButtonAtkStartY,
                 leftButtonAtkStartX+buttonAtkSizeX, rightButtonDefStartY);
-        rightAtkBtn.drawImageBox(canvas, atkBtnCode, rightButtonAtkStartX, rightButtonAtkStartY,
+        rightAtkBtn.setPosition(rightButtonAtkStartX, rightButtonAtkStartY,
                 gameEndX, rightButtonDefStartY);
-        leftDefBtn.drawImageBox(canvas, defBtnCode, leftButtonDefStartX, leftButtonDefStartY,
+        leftDefBtn.setPosition(leftButtonDefStartX, leftButtonDefStartY,
                 leftButtonAtkStartX+buttonAtkSizeX, gameEndY);
-        rightDefBtn.drawImageBox(canvas, defBtnCode, rightButtonDefStartX, rightButtonDefStartY,
+        rightDefBtn.setPosition(rightButtonDefStartX, rightButtonDefStartY,
                 gameEndX, gameEndY);
 
-        // ### 테스트용 - 클릭시 해당 위치에 사각형 표시
+        // 이미지 그리기
+        leftAtkBtn.drawImageBox(canvas, atkBtnCode);
+        rightAtkBtn.drawImageBox(canvas, atkBtnCode);
+        leftDefBtn.drawImageBox(canvas, defBtnCode);
+        rightDefBtn.drawImageBox(canvas, defBtnCode);
+
+        // 터치 위치가 각 버튼에 해당한다면 ###임시 정보 표시
+        if(Functions.ifInsideRect(touchX, touchY,
+                leftAtkBtn.sx, leftAtkBtn.sy, leftAtkBtn.ex, leftAtkBtn.ey)){
+            textInfoTemp = "왼쪽 공격 버튼";
+        }
+        else if(Functions.ifInsideRect(touchX, touchY,
+                rightAtkBtn.sx, rightAtkBtn.sy, rightAtkBtn.ex, rightAtkBtn.ey)){
+            textInfoTemp = "오른쪽 공격 버튼";
+        }
+        else if(Functions.ifInsideRect(touchX, touchY,
+                leftDefBtn.sx, leftDefBtn.sy, leftDefBtn.ex, leftDefBtn.ey)){
+            textInfoTemp = "왼쪽 방어 버튼";
+        }
+        else if(Functions.ifInsideRect(touchX, touchY,
+                rightDefBtn.sx, rightDefBtn.sy, rightDefBtn.ex, rightDefBtn.ey)){
+            textInfoTemp = "오른쪽 방어 버튼";
+        }
+
+        // ----- [텍스트 정보 표시] -----
+
+        // 텍스트 색상 및 크기 지정
+        stageinfoPaint.setColor(Color.BLACK);
+        stageinfoPaint.setTextSize(40f);
+
+        // 스테이지 정보 텍스트 표시
+        canvas.drawText("현재 스테이지 : [" + nowWorld + " - " + nowStage + "]",
+                gameStartX + 20f, gameStartY + 50f,
+                stageinfoPaint);
+
+        // 임시 정보 표시
+        canvas.drawText("정보 임시 표시 : [" + textInfoTemp + "]",
+                gameStartX + 20f, gameStartY + 90f,
+                stageinfoPaint);
+
+        // ----- [임시] -----
+
+        // ### 테스트용 - 터치시 해당 위치에 사각형 표시
         if (touchX != -1 && touchY != -1) {
             float rectSize = 25f;
             float rectLeft = touchX - rectSize / 2;
@@ -208,6 +245,7 @@ public class GameView extends View implements Choreographer.FrameCallback {
             touchPointPaint.setStyle(Paint.Style.FILL);
             canvas.drawRect(rectLeft, rectTop, rectRight, rectBottom, touchPointPaint);
         }
+
     }
 
     @Override
