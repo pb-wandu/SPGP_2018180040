@@ -14,8 +14,9 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import Seungwan.HeosilStory.app.MainActivity;
-import Seungwan.HeosilStory.framework.game.imageBox;
 import Seungwan.HeosilStory.framework.game.Functions;
+import Seungwan.HeosilStory.framework.game.ImageBox;
+import Seungwan.HeosilStory.framework.game.TimeBar;
 
 // import android.graphics.Bitmap;
 // import android.graphics.BitmapFactory;
@@ -102,10 +103,13 @@ public class GameView extends View implements Choreographer.FrameCallback {
     private final Paint touchPointPaint = new Paint();
 
     // 이미지 박스 오브젝트 (공격, 방어 버튼)
-    imageBox leftAtkBtn = new imageBox();
-    imageBox leftDefBtn = new imageBox();
-    imageBox rightAtkBtn = new imageBox();
-    imageBox rightDefBtn = new imageBox();
+    ImageBox leftAtkBtn = new ImageBox();
+    ImageBox leftDefBtn = new ImageBox();
+    ImageBox rightAtkBtn = new ImageBox();
+    ImageBox rightDefBtn = new ImageBox();
+
+    // 타임 바
+    TimeBar timeBar = new TimeBar();
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -215,6 +219,23 @@ public class GameView extends View implements Choreographer.FrameCallback {
                 rightDefBtn.sx, rightDefBtn.sy, rightDefBtn.ex, rightDefBtn.ey)){
             textInfoTemp = "오른쪽 방어 버튼";
         }
+        else{
+            textInfoTemp = "# 아무것도 터치 안 함 #";
+        }
+
+        // ----- [타임 바 : 시간 정보 표시] -----
+
+        float timeBarSizeX = gameScreenSizeX * 3 / 4;
+        float timeBarSizeY = gameScreenSizeY * 1 / 36;
+        float timeBarStartX = (gameEndX-gameStartX) / 2 - timeBarSizeX / 2;
+        float timeBarStartY = gameStartY + gameScreenSizeY * 1 / 6;
+
+        timeBar.setPosition(
+                timeBarStartX, timeBarStartY,
+                timeBarStartX + timeBarSizeX, timeBarStartY + timeBarSizeY);
+        timeBar.setTime(2.0f);
+
+        timeBar.drawTimeBar(canvas);
 
         // ----- [텍스트 정보 표시] -----
 
