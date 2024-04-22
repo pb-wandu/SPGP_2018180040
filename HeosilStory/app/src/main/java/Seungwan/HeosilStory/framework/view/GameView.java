@@ -233,8 +233,11 @@ public class GameView extends View implements Choreographer.FrameCallback {
         timeBar.setPosition(
                 timeBarStartX, timeBarStartY,
                 timeBarStartX + timeBarSizeX, timeBarStartY + timeBarSizeY);
+
+        // 타임 바 시간 설정
         timeBar.setTime(2.0f);
 
+        // 타임 바 그리기
         timeBar.drawTimeBar(canvas);
 
         // ----- [텍스트 정보 표시] -----

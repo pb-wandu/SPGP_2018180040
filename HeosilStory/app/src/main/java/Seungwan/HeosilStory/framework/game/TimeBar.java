@@ -24,14 +24,34 @@ public class TimeBar {
         nowTime = maxTime;
     }
 
+    // 시간 업데이트
+    public void updateTime() {
+        // 현재 시간
+        long currentTime = System.currentTimeMillis();
+
+        if (nowTime > 0) {
+            long elapsedTime = currentTime % 1000;
+            nowTime -= (elapsedTime / 1000.0f);
+            nowTime = Math.max(nowTime, 0);
+        }
+
+        // 0초가 되었다면 maxTime으로 채워진다.
+        if (nowTime <= 0) {
+            nowTime = maxTime;
+        }
+    }
+
     // 입력받은 네 좌표를 가지고 타임 바를 그린다.
     public void drawTimeBar(Canvas c) {
+
+        // 시간을 업데이트한다.
+        updateTime();
 
         final Paint paint = new Paint();
 
         // 타임 바 내부 그리기
-        float nowEx = sx + (ex - sx) * nowTime / maxTime;
-        float nowEy = sy + (ey - sy) * nowTime / maxTime;
+        float nowEx = sx - (ex - sx) + (ex - sx) * 2 * nowTime / maxTime;
+        float nowEy = sy + (ey - sy);
         paint.setColor(Color.rgb(120, 200, 200));
         paint.setStyle(Paint.Style.FILL);
         c.drawRect(sx, sy, nowEx, nowEy, paint);
